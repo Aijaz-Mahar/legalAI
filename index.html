@@ -151,35 +151,33 @@ async function generateDraft() {
     const facts = document.getElementById('facts').value;
     const outputDiv = document.getElementById('output');
     const statusDiv = document.getElementById('status');
-    
-    // REPLACE THIS with your actual GAS Web App URL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwSyhi6nK80NmQ38fy9xntQn-uHYUbuBINDGmqjmS_SUvHdcpP3fsSCkNAqLEIaSfiUvg/exec";
 
     if (!facts) return alert("Please enter facts!");
-    statusDiv.innerHTML = "<span style='color:blue;'>⏳ Server is drafting (Secure Mode)...</span>";
+    statusDiv.innerHTML = "⏳ Sending to Secure Server...";
 
     try {
         const response = await fetch(GAS_URL, {
             method: "POST",
-            mode: "no-cors", // Note: GAS often requires no-cors or redirect handling
+            // CRITICAL: Use text/plain to avoid CORS preflight issues
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
                 facts: facts,
                 prompt: specializedPrompt
             })
         });
 
-        // Because GAS uses redirects, 'fetch' can sometimes be tricky. 
-        // A better approach for GAS is often using a simple XHR or a specialized fetch:
-        
         const result = await response.json();
+        
+        // Remove markdown symbols from AI response
         let cleanText = result.choices[0].message.content.replace(/\*/g, '').replace(/#/g, '');
         outputDiv.innerText = cleanText;
-        statusDiv.innerHTML = "<span style='color:green;'>✅ Draft Complete</span>";
+        statusDiv.innerHTML = "✅ Success";
     } catch (err) {
-        statusDiv.innerHTML = "<span style='color:red;'>❌ Connection Failed. Check GAS deployment.</span>";
+        console.log(err);
+        statusDiv.innerHTML = "❌ Error: See Console (Press F12)";
     }
 }
-
     function copyText() {
         const text = document.getElementById('output').innerText;
         navigator.clipboard.writeText(text);
@@ -187,4 +185,5 @@ async function generateDraft() {
     }
 </script>
 </body>
+
 </html>
