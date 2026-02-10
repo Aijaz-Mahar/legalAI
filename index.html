@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pakistan Legal AI | Plain Text Edition</title>
     <style>
+        /* CSS remains exactly the same as per your design */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --legal-green: #004d40; --white: #ffffff; }
-        
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; }
-
         header { background-color: var(--legal-green); width: 100%; height: 70px; display: flex; justify-content: center; position: sticky; top: 0; z-index: 9999; }
         .nav-container { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
         .logo { color: var(--white); font-size: 1.4rem; font-weight: bold; text-decoration: none; }
-
-        /* FULL MENU NAVIGATION */
         .nav-list { display: flex; list-style: none; }
         .dropdown { position: relative; }
         .dropdown > a { color: var(--white); text-decoration: none; font-weight: 600; padding: 25px 15px; display: block; cursor: pointer; }
@@ -22,29 +19,12 @@
         .submenu li a { color: #333; padding: 12px 15px; display: block; text-decoration: none; border-bottom: 1px solid #eee; font-size: 0.85rem; }
         .submenu li a:hover { background: #f1f1f1; color: var(--legal-green); font-weight: bold; }
         .dropdown:hover .submenu { display: block; }
-
-        /* CENTERED CONTENT */
         main { width: 100%; max-width: 900px; padding: 40px 20px; text-align: center; }
         .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: left; }
         .expert-label { background: var(--legal-green); color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 15px; display: inline-block; }
-        
         textarea { width: 100%; height: 150px; margin: 10px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
         button { background: var(--legal-green); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        
-        /* OUTPUT AREA (PLAIN TEXT) */
-        #output { 
-            background: #ffffff; 
-            border: 1px solid #ddd; 
-            padding: 40px; 
-            min-height: 400px; 
-            white-space: pre-wrap; 
-            margin-top: 20px; 
-            font-family: 'Times New Roman', Times, serif; 
-            font-size: 12pt; 
-            line-height: 1.5; 
-            color: #000;
-        }
-
+        #output { background: #ffffff; border: 1px solid #ddd; padding: 40px; min-height: 400px; white-space: pre-wrap; margin-top: 20px; font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; color: #000; }
         footer { margin-top: 40px; padding: 20px; color: #666; font-size: 0.9rem; }
     </style>
 </head>
@@ -103,97 +83,68 @@
 </main>
 
 <script>
-    const API_KEY = "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";
     let specializedPrompt = "You are a senior Pakistani lawyer.";
-
-    // Instruction to stop AI from using Markdown (* and **)
-    const NO_MARKDOWN = " CRITICAL RULES: 1. Output MUST be PLAIN TEXT only. 2. NEVER use asterisks (**), hashes (#), or bold symbols. 3. Use CAPS for headings. 4. NEVER use the word 'Sheweth'; use 'Respectfully Submitted'. 5. No strange symbols or non-English characters.";
+    const NO_MARKDOWN = " CRITICAL RULES: 1. Output MUST be PLAIN TEXT only. 2. NEVER use asterisks (**), hashes (#), or symbols. 3. Use CAPS for headings. 4. NEVER use the word 'Sheweth'; use 'Respectfully Submitted'.";
 
     function setMode(type) {
         const label = document.getElementById('expert-mode');
         const area = document.getElementById('facts');
-        
         switch(type) {
-            case 'bail':
-                specializedPrompt = "Expert Criminal Advocate. Draft a Bail Application under 497/498 CrPC." + NO_MARKDOWN;
-                label.innerText = "MODE: CRIMINAL (BAIL)";
-                area.placeholder = "Enter FIR details and reasons for bail...";
-                break;
-            case 'quash':
-                specializedPrompt = "Expert Criminal Advocate. Draft FIR Quashment Petition under 561-A CrPC." + NO_MARKDOWN;
-                label.innerText = "MODE: FIR QUASHMENT";
-                break;
-            case 'prop':
-                specializedPrompt = "Expert Civil Advocate. Draft a Suit for Property/Injunction." + NO_MARKDOWN;
-                label.innerText = "MODE: CIVIL (PROPERTY)";
-                break;
-            case 'contract':
-                specializedPrompt = "Legal Consultant. Draft a professional Agreement or Contract." + NO_MARKDOWN;
-                label.innerText = "MODE: CONTRACTS/AGREEMENTS";
-                break;
-            case 'cyber_def':
-                specializedPrompt = "Cyber Law Expert. Draft a notice under PECA 2016 for defamation." + NO_MARKDOWN;
-                label.innerText = "MODE: CYBER DEFAMATION";
-                break;
-            case 'writ':
-                specializedPrompt = "Service Law Expert. Draft a Writ Petition for service matters." + NO_MARKDOWN;
-                label.innerText = "MODE: SERVICE WRIT";
-                break;
-            default:
-                specializedPrompt = "Senior Pakistani Advocate. Draft formal court document." + NO_MARKDOWN;
-                label.innerText = "MODE: GENERAL LEGAL";
+            case 'bail': specializedPrompt = "Expert Criminal Advocate. Draft a Bail Application under 497/498 CrPC." + NO_MARKDOWN; label.innerText = "MODE: CRIMINAL (BAIL)"; area.placeholder = "Enter FIR details..."; break;
+            case 'quash': specializedPrompt = "Expert Criminal Advocate. Draft FIR Quashment Petition under 561-A CrPC." + NO_MARKDOWN; label.innerText = "MODE: FIR QUASHMENT"; break;
+            case 'prop': specializedPrompt = "Expert Civil Advocate. Draft a Suit for Property/Injunction." + NO_MARKDOWN; label.innerText = "MODE: CIVIL (PROPERTY)"; break;
+            default: specializedPrompt = "Senior Pakistani Advocate. Draft formal court document." + NO_MARKDOWN; label.innerText = "MODE: GENERAL LEGAL";
         }
         alert("Active Expert: " + label.innerText);
     }
 
-   // Replace the old generateDraft function with this one
-async function generateDraft() {
-    const facts = document.getElementById('facts').value;
-    const outputDiv = document.getElementById('output');
-    const statusDiv = document.getElementById('status');
-    // Ensure this URL is your exact "Web App URL" from GAS
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwSyhi6nK80NmQ38fy9xntQn-uHYUbuBINDGmqjmS_SUvHdcpP3fsSCkNAqLEIaSfiUvg/exec";
+    async function generateDraft() {
+        const facts = document.getElementById('facts').value;
+        const outputDiv = document.getElementById('output');
+        const statusDiv = document.getElementById('status');
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwSyhi6nK80NmQ38fy9xntQn-uHYUbuBINDGmqjmS_SUvHdcpP3fsSCkNAqLEIaSfiUvg/exec";
 
-    if (!facts) return alert("Please enter facts!");
-    statusDiv.innerHTML = "⏳ Connecting to Secure Backend...";
+        if (!facts) return alert("Please enter facts!");
+        statusDiv.innerHTML = "<span style='color:blue;'>⏳ Server is drafting (Gemini Secure Mode)...</span>";
 
-    try {
-        const response = await fetch(GAS_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({
-                facts: facts,
-                prompt: specializedPrompt
-            })
-        });
+        try {
+            const response = await fetch(GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    facts: facts,
+                    prompt: specializedPrompt
+                })
+            });
 
-        const result = await response.json();
-        console.log("Server Response:", result); // Useful for debugging (F12)
-
-        // SAFE CHECK: Check if choices exists before reading index [0]
-        if (result && result.choices && result.choices.length > 0) {
-            let rawText = result.choices[0].message.content;
-            // Remove markdown symbols
-            let cleanText = rawText.replace(/\*/g, '').replace(/#/g, '');
-            outputDiv.innerText = cleanText;
-            statusDiv.innerHTML = "✅ Success";
-        } else if (result.error) {
-            statusDiv.innerHTML = "❌ AI Error: " + result.error.message;
-        } else {
-            statusDiv.innerHTML = "❌ Empty Response. Check API Key/Balance.";
+            const result = await response.json();
+            
+            // LOGIC FOR GOOGLE GEMINI RESPONSE STRUCTURE
+            if (result.candidates && result.candidates[0] && result.candidates[0].content) {
+                let rawText = result.candidates[0].content.parts[0].text;
+                
+                // Extra safety: Remove any markdown characters that AI might include
+                let cleanText = rawText.replace(/\*/g, '').replace(/#/g, '').replace(/_/g, '');
+                
+                outputDiv.innerText = cleanText;
+                statusDiv.innerHTML = "<span style='color:green;'>✅ Draft Complete</span>";
+            } else if (result.error) {
+                statusDiv.innerHTML = "<span style='color:red;'>❌ AI Error: " + result.error.message + "</span>";
+            } else {
+                statusDiv.innerHTML = "<span style='color:red;'>❌ Unexpected Response Format.</span>";
+                console.log("Full Response:", result);
+            }
+        } catch (err) {
+            console.error("Fetch Error:", err);
+            statusDiv.innerHTML = "<span style='color:red;'>❌ Connection Failed. Check GAS deployment.</span>";
         }
-    } catch (err) {
-        console.error("Fetch Error:", err);
-        statusDiv.innerHTML = "❌ Connection Failed. Did you Deploy as 'Anyone'?";
     }
-}    function copyText() {
+
+    function copyText() {
         const text = document.getElementById('output').innerText;
         navigator.clipboard.writeText(text);
-        alert("Copied to clipboard! You can now paste it into Word.");
+        alert("Copied to clipboard!");
     }
 </script>
 </body>
-
 </html>
-
-
