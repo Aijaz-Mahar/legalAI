@@ -151,15 +151,15 @@ async function generateDraft() {
     const facts = document.getElementById('facts').value;
     const outputDiv = document.getElementById('output');
     const statusDiv = document.getElementById('status');
+    // Ensure this URL is your exact "Web App URL" from GAS
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwSyhi6nK80NmQ38fy9xntQn-uHYUbuBINDGmqjmS_SUvHdcpP3fsSCkNAqLEIaSfiUvg/exec";
 
     if (!facts) return alert("Please enter facts!");
-    statusDiv.innerHTML = "⏳ Sending to Secure Server...";
+    statusDiv.innerHTML = "⏳ Connecting to Secure Backend...";
 
     try {
         const response = await fetch(GAS_URL, {
             method: "POST",
-            // CRITICAL: Use text/plain to avoid CORS preflight issues
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
                 facts: facts,
@@ -168,17 +168,25 @@ async function generateDraft() {
         });
 
         const result = await response.json();
-        
-        // Remove markdown symbols from AI response
-        let cleanText = result.choices[0].message.content.replace(/\*/g, '').replace(/#/g, '');
-        outputDiv.innerText = cleanText;
-        statusDiv.innerHTML = "✅ Success";
+        console.log("Server Response:", result); // Useful for debugging (F12)
+
+        // SAFE CHECK: Check if choices exists before reading index [0]
+        if (result && result.choices && result.choices.length > 0) {
+            let rawText = result.choices[0].message.content;
+            // Remove markdown symbols
+            let cleanText = rawText.replace(/\*/g, '').replace(/#/g, '');
+            outputDiv.innerText = cleanText;
+            statusDiv.innerHTML = "✅ Success";
+        } else if (result.error) {
+            statusDiv.innerHTML = "❌ AI Error: " + result.error.message;
+        } else {
+            statusDiv.innerHTML = "❌ Empty Response. Check API Key/Balance.";
+        }
     } catch (err) {
-        console.log(err);
-        statusDiv.innerHTML = "❌ Error: See Console (Press F12)";
+        console.error("Fetch Error:", err);
+        statusDiv.innerHTML = "❌ Connection Failed. Did you Deploy as 'Anyone'?";
     }
-}
-    function copyText() {
+}    function copyText() {
         const text = document.getElementById('output').innerText;
         navigator.clipboard.writeText(text);
         alert("Copied to clipboard! You can now paste it into Word.");
@@ -187,3 +195,4 @@ async function generateDraft() {
 </body>
 
 </html>
+
